@@ -1,0 +1,42 @@
+@startuml
+actor Suppliers
+control Comptroller_Contract
+control CToken_Contract
+actor Borrowers
+
+
+== supply ==
+
+Suppliers -> Comptroller_Contract: 授权可以抵押某个币种
+Comptroller_Contract-> Comptroller_Contract: enterMarkets(cTokens)
+
+Suppliers -> CToken_Contract: 抵押(转入对应币种的资金到合约，并自动调用铸币方法)
+CToken_Contract -> CToken_Contract: Mint (生成cToken)
+CToken_Contract --> Suppliers: 收到cToken
+
+
+== withdraw ==
+
+Suppliers -> CToken_Contract: 发起提现
+CToken_Contract -> CToken_Contract : redeemUnderlying(redeemAmount)
+CToken_Contract --> Suppliers: 发送提现金额的代币
+Suppliers <-- CToken_Contract: 扣除对应提现金额数量的cToken
+
+
+== borrowing ==
+
+Borrowers -> CToken_Contract: 发起借款
+CToken_Contract -> CToken_Contract: borrow(borrowAmount)
+CToken_Contract --> Borrowers: 发起对应借款金额的转账
+
+== repay ==
+Borrowers-> CToken_Contract: 发起还款
+CToken_Contract -> CToken_Contract : repayBorrow(repayAmount)
+Borrowers <-- CToken_Contract : 扣除对应的还款金额
+
+== liquidate ==
+== vote ==
+
+@enduml
+
+
